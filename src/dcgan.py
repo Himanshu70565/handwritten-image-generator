@@ -15,27 +15,88 @@ def weights_init(w):
         nn.init.constant_(w.bias.data, 0)
 
 
-#TODO!! Part 2. Finish the following two definition of classes to define Generator and Discriminitor model structure
 # Define the Generator Network
 class Generator(nn.Module):
-    def __init__(self, params):
+    def __init__(self):
         super().__init__()
+        # Input Dimension: (nc = 1) x 1 x 100
+        # CN1: 100 input channel, 256 output channels, 4x4 square convolution, stride=2, padding=0
+        self.conv1 = nn.ConvTranspose2d(100, 256, kernel_size = 4, stride = 2, padding = 0)
+        # CN2: 256 input channel, 128 output channels, 4x4 square convolution, stride=2, padding=1
+        self.conv2 = nn.ConvTranspose2d(256, 128, kernel_size = 4, stride = 2, padding = 1)
+        # CN3: 128 input channel, 64 output channels, 4x4 square convolution, stride=2, padding=1
+        self.conv3 = nn.ConvTranspose2d(128, 64, kernel_size = 4, stride = 2, padding = 1)
+        # CN4: 64 input channel, 1 output channel, 4x4 square convolution, stride=2, padding=1
+        self.conv4 = nn.ConvTranspose2d(64, 1, kernel_size = 4, stride = 2, padding = 1)
 
-        # Input is the latent vector Z.
+        # Batch Normalization layers
+        self.bn1 = nn.BatchNorm2d(256)
+        self.bn2 = nn.BatchNorm2d(128)
+        self.bn3 = nn.BatchNorm2d(64)
 
-        #TODO!! Define layers here
 
-    def forward(self, x):
-        #TODO!! Define how the data flows in Generator
+    def forward(self, input):
+        # Convolution layer C1: 1 input channel, 64 output channels,
+        # 4x4 square convolution, it uses Batch normalization and RELU activation function, and
+        # outputs a Tensor with size (N, 64, 16, 16), where N is the size of the batch
+        c1 = F.relu(self.bn1(self.conv1(input)))
+        
+        # Convolution layer C2: 64 input channel, 128 output channels,
+        # 4x4 square convolution, it uses Batch normalization and RELU activation function, and        
+        # outputs a Tensor with size (N, 128, 8, 8), where N is the size of the batch
+        c2 = F.relu(self.bn2(self.conv2(c1)))
+                
+        # Convolution layer C3: 128 input channel, 256 output channel
+        # 4x4 square convolution, it uses Batch normalization and RELU activation function, and
+        # outputs a Tensor with size (N, 256, 4, 4), where N is the size of the batch
+        c3 = F.relu(self.bn3(self.conv3(c2)))
+        
+        # Convolution layer C4: 256 input channel, 1 output channel
+        # 4x4 square convolution, it uses Sigmoid activation function, and
+        # outputs a Tensor with size (N, 1, 1, 1), where N is the size of the batch
+        output = F.tanh(self.conv4(c3))
+                
+        return output
 
-        return x
+
 class Discriminator(nn.Module):
-    def __init__(self, params):
+    def __init__(self):
         super().__init__()
-        # Input Dimension: (nc) x 32 x 32
-        #TODO!! Define layers here
+        # Input Dimension: (nc = 1) x 32 x 32
+        # CN1: 1 input channel, 64 output channels, 4x4 square convolution, stride=2, padding=1
+        self.conv1 = nn.Conv2d(1, 64, kernel_size = 4, stride = 2, padding = 1)
+        # CN2: 64 input channel, 128 output channels, 4x4 square convolution, stride=2, padding=1
+        self.conv2 = nn.Conv2d(64, 128, kernel_size = 4, stride = 2, padding = 1)
+        # CN3: 128 input channel, 256 output channels, 4x4 square convolution, stride=2, padding=1
+        self.conv3 = nn.Conv2d(128, 256, kernel_size = 4, stride = 2, padding = 1)
+        # CN4: 256 input channel, 1 output channel, 4x4 square convolution, stride=2, padding=0
+        self.conv4 = nn.Conv2d(256, 1, kernel_size = 4, stride = 2, padding = 0)
 
+        # Batch Normalization layers
+        self.bn1 = nn.BatchNorm2d(64)
+        self.bn2 = nn.BatchNorm2d(128)
+        self.bn3 = nn.BatchNorm2d(256)
+                
 
-    def forward(self, x):
-        #TODO!! Define how the data flows in Discriminator
-        return x
+    def forward(self, input):
+        # Convolution layer C1: 1 input channel, 64 output channels,
+        # 4x4 square convolution, it uses Batch normalization and RELU activation function, and
+        # outputs a Tensor with size (N, 64, 16, 16), where N is the size of the batch
+        c1 = F.relu(self.bn1(self.conv1(input)))
+
+        # Convolution layer C2: 64 input channel, 128 output channels,
+        # 4x4 square convolution, it uses Batch normalization and RELU activation function, and        
+        # outputs a Tensor with size (N, 128, 8, 8), where N is the size of the batch
+        c2 = F.relu(self.bn2(self.conv2(c1)))
+        
+        # Convolution layer C3: 128 input channel, 256 output channel
+        # 4x4 square convolution, it uses Batch normalization and RELU activation function, and
+        # outputs a Tensor with size (N, 256, 4, 4), where N is the size of the batch
+        c3 = F.relu(self.bn3(self.conv3(c2)))
+
+        # Convolution layer C4: 256 input channel, 1 output channel
+        # 4x4 square convolution, it uses Sigmoid activation function, and
+        # outputs a Tensor with size (N, 1, 1, 1), where N is the size of the batch
+        output = F.sigmoid(self.conv4(c3))
+        
+        return output
