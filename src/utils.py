@@ -1,16 +1,18 @@
 import torch
-import torchvision.transforms as transforms
+import torchvision.transforms.v2 as v2
 import torchvision.datasets as dset
 
-# TODO!!! Directory containing the data.
-#
-root = 'YOUR_PATH_TO_TRAIN_DATA'
+# Directory containing the data.
+root = '../dataset/Train'
 def get_EMNIST(params):
-    #TODO! Part 1. Complete the data_loader and ensure it can successfully load images from your folder
-    transform = transforms.Compose([
-        transforms.Grayscale(),
-        # TODO! Add some processing transforms for data augmentation
-        transforms.ToTensor()])
+
+    # Compose the transformations to be applied to the images.
+    # Transformation: Grayscale -> Resize to (32, 32) -> Convert to Image -> Convert to Tensor with dtype float32
+    transform = v2.Compose([
+        v2.Grayscale(),
+        v2.Resize((32, 32)),            
+        v2.ToImage(),
+        v2.ToDtype(torch.float32, scale=True)])
 
     # Create the dataset.
     dataset = dset.ImageFolder(root=root, transform=transform)
@@ -21,3 +23,4 @@ def get_EMNIST(params):
         shuffle=True)
 
     return dataloader
+
