@@ -17,22 +17,24 @@ def weights_init(w):
 
 # Define the Generator Network
 class Generator(nn.Module):
-    def __init__(self):
+    def __init__(self, params):
         super().__init__()
+        nc, nz, ngf = params['nc'], params['nz'], params['ngf']
+
         # Input Dimension: (nc = 1) x 1 x 100
         # CN1: 100 input channel, 256 output channels, 4x4 square convolution, stride=2, padding=0
-        self.conv1 = nn.ConvTranspose2d(100, 256, kernel_size = 4, stride = 2, padding = 0)
+        self.conv1 = nn.ConvTranspose2d(nz, ngf * 4, kernel_size = 4, stride = 2, padding = 0)
         # CN2: 256 input channel, 128 output channels, 4x4 square convolution, stride=2, padding=1
-        self.conv2 = nn.ConvTranspose2d(256, 128, kernel_size = 4, stride = 2, padding = 1)
+        self.conv2 = nn.ConvTranspose2d(ngf * 4, ngf * 2, kernel_size = 4, stride = 2, padding = 1)
         # CN3: 128 input channel, 64 output channels, 4x4 square convolution, stride=2, padding=1
-        self.conv3 = nn.ConvTranspose2d(128, 64, kernel_size = 4, stride = 2, padding = 1)
+        self.conv3 = nn.ConvTranspose2d(ngf * 2, ngf, kernel_size = 4, stride = 2, padding = 1)
         # CN4: 64 input channel, 1 output channel, 4x4 square convolution, stride=2, padding=1
-        self.conv4 = nn.ConvTranspose2d(64, 1, kernel_size = 4, stride = 2, padding = 1)
+        self.conv4 = nn.ConvTranspose2d(ngf, nc, kernel_size = 4, stride = 2, padding = 1)
 
         # Batch Normalization layers
-        self.bn1 = nn.BatchNorm2d(256)
-        self.bn2 = nn.BatchNorm2d(128)
-        self.bn3 = nn.BatchNorm2d(64)
+        self.bn1 = nn.BatchNorm2d(ngf * 4)
+        self.bn2 = nn.BatchNorm2d(ngf * 2)
+        self.bn3 = nn.BatchNorm2d(ngf)
 
 
     def forward(self, input):
@@ -60,22 +62,25 @@ class Generator(nn.Module):
 
 
 class Discriminator(nn.Module):
-    def __init__(self):
+    def __init__(self, params):
         super().__init__()
+        
+        nc, ndf = params['nc'], params['ndf']
+
         # Input Dimension: (nc = 1) x 32 x 32
         # CN1: 1 input channel, 64 output channels, 4x4 square convolution, stride=2, padding=1
-        self.conv1 = nn.Conv2d(1, 64, kernel_size = 4, stride = 2, padding = 1)
+        self.conv1 = nn.Conv2d(nc, ndf, kernel_size = 4, stride = 2, padding = 1)
         # CN2: 64 input channel, 128 output channels, 4x4 square convolution, stride=2, padding=1
-        self.conv2 = nn.Conv2d(64, 128, kernel_size = 4, stride = 2, padding = 1)
+        self.conv2 = nn.Conv2d(ndf, ndf * 2, kernel_size = 4, stride = 2, padding = 1)
         # CN3: 128 input channel, 256 output channels, 4x4 square convolution, stride=2, padding=1
-        self.conv3 = nn.Conv2d(128, 256, kernel_size = 4, stride = 2, padding = 1)
+        self.conv3 = nn.Conv2d(ndf * 2, ndf * 4, kernel_size = 4, stride = 2, padding = 1)
         # CN4: 256 input channel, 1 output channel, 4x4 square convolution, stride=2, padding=0
-        self.conv4 = nn.Conv2d(256, 1, kernel_size = 4, stride = 2, padding = 0)
+        self.conv4 = nn.Conv2d(ndf * 4, nc, kernel_size = 4, stride = 2, padding = 0)
 
         # Batch Normalization layers
-        self.bn1 = nn.BatchNorm2d(64)
-        self.bn2 = nn.BatchNorm2d(128)
-        self.bn3 = nn.BatchNorm2d(256)
+        self.bn1 = nn.BatchNorm2d(ndf)
+        self.bn2 = nn.BatchNorm2d(ndf * 2)
+        self.bn3 = nn.BatchNorm2d(ndf * 4)
                 
 
     def forward(self, input):

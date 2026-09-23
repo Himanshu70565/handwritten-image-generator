@@ -20,6 +20,7 @@ print("Random Seed: ", seed)
 
 # Parameters to define for the program
 #TODO!!! Change the parameters according to your own needs
+# Note: The parameters for the training should match those used during generator. Adjust them as necessary.
 params = {
     "bsize" : 32,# Batch size during training.
     'imsize' : 32,# Spatial size of training images. All images will be resized to this size during preprocessing.
@@ -32,6 +33,7 @@ params = {
     'beta1' : 0.5,# Beta1 hyperparam for Adam optimizer
     'save_epoch' : 10}# Save step.
 
+# Check if GPU is available, else use CPU
 if torch.cuda.is_available():
     device = torch.device("cuda")
 elif torch.backends.mps.is_available():
@@ -106,13 +108,13 @@ def plot_result(generator, noise, num_epoch, save=False, save_dir='DCGAN_results
     else:
         plt.close()
 
-netG = Generator().to(device)
+netG = Generator(params).to(device)
 # The weights_init() function is called to randomly initialize all weights to mean=0.0, stddev=0.2
 netG.apply(weights_init)
 # Print the model to check the structure
 print(netG)
 
-netD = Discriminator().to(device)
+netD = Discriminator(params).to(device)
 # Apply the weights_init() function to randomly initialize all
 # weights to mean=0.0, stddev=0.2
 netD.apply(weights_init)

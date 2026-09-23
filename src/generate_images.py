@@ -1,11 +1,17 @@
 import os
-
 import torch
 from torchvision.utils import save_image
 
 from dcgan import Generator
 
+# Note: The parameters for the generator should match those used during training. Adjust them as necessary.
+params = {
+    'nc': 1,
+    'nz': 100,
+    'ngf': 64,
+}
 
+# Check if GPU is available, else use CPU
 if torch.cuda.is_available():
     device = torch.device("cuda")
 elif torch.backends.mps.is_available():
@@ -15,7 +21,7 @@ else:
 
 print("Using device:", device)
 
-model = Generator().to(device)
+model = Generator(params).to(device)
 model.load_state_dict(torch.load("TRAINING_models/generator_trained.pth", map_location=device))
 model.eval()
 
@@ -25,6 +31,7 @@ noise = torch.randn(20, 100, 1, 1, device=device)
 with torch.no_grad():
     images = model(noise)
 
+# Save the generated images to the "GENERATED_images" directory
 for index, image in enumerate(images, start=1):
     save_image(image, f"GENERATED_images/image_{index:02d}.png", normalize=True, value_range=(-1, 1))
 
