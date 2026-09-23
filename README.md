@@ -11,10 +11,11 @@ Contents
 - `src/utils.py` — Data loading and image transformations
 - `src/train.py` — DCGAN training and checkpoint saving
 - `src/generate_images.py` — Loads the trained generator and creates 20 images
-- `src/TRAINING_models/` — Saved generator and discriminator checkpoints
-- `src/TRAINING_results/` — Generated samples saved during training
-- `src/DCGAN_results/` — Generator and discriminator loss plots
-- `src/GENERATED_images/` — Final generated character images
+- `training_models/` — Saved generator and discriminator checkpoints
+- `training_results/` — Generated samples saved during training
+- `dcgan_results/` — Generator and discriminator loss plots
+- `generated_images/` — Final generated character images
+- `generator_progress.gif` — Animation showing generator progress during training
 
 Prerequisites
 - Python 3.12 (recommended)
@@ -40,4 +41,7 @@ python train.py
 ```bash
 python generate_images.py
 ```
+
+Training outputs and generated images are saved in the project root, alongside
+the `src/` folder, rather than inside `src/`.
 

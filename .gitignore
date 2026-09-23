@@ -2,10 +2,11 @@
 dataset/
 .DS_Store
 .venv/
-src/DCGAN_results/*
-src/TRAINING_results/*
-src/TRAINING_models/*
-src/discriminator_*.pth
-src/generator_*.pth
+dcgan_results/*
+training_results/*
+training_models/*
+training_models/discriminator_*.pth
+training_models/generator_*.pth
 src/__pycache__/*
-src/GENERATED_images/*
+generated_images/*
+generator_progress.gif

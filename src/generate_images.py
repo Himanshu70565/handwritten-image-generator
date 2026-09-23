@@ -4,6 +4,10 @@ from torchvision.utils import save_image
 
 from dcgan import Generator
 
+project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+training_models_dir = os.path.join(project_dir, "training_models")
+generated_images_dir = os.path.join(project_dir, "generated_images")
+
 # Note: The parameters for the generator should match those used during training. Adjust them as necessary.
 params = {
     'nc': 1,
@@ -22,10 +26,10 @@ else:
 print("Using device:", device)
 
 model = Generator(params).to(device)
-model.load_state_dict(torch.load("TRAINING_models/generator_trained.pth", map_location=device))
+model.load_state_dict(torch.load(os.path.join(training_models_dir, "generator_trained.pth"), map_location=device))
 model.eval()
 
-os.makedirs("GENERATED_images", exist_ok=True)
+os.makedirs(generated_images_dir, exist_ok=True)
 noise = torch.randn(20, 100, 1, 1, device=device)
 
 with torch.no_grad():
@@ -33,6 +37,6 @@ with torch.no_grad():
 
 # Save the generated images to the "GENERATED_images" directory
 for index, image in enumerate(images, start=1):
-    save_image(image, f"GENERATED_images/image_{index:02d}.png", normalize=True, value_range=(-1, 1))
+    save_image(image, os.path.join(generated_images_dir, f"image_{index:02d}.png"), normalize=True, value_range=(-1, 1))
 
-print("Saved 20 images to GENERATED_images/")
+print(f"Saved 20 images to {generated_images_dir}/")

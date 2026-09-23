@@ -28,7 +28,7 @@ params = {
     'nz' : 100,# Size of the Z latent vector (the input to the generator).
     'ngf' : 64,# Size of feature maps in the generator. The depth will be multiples of this.
     'ndf' : 64, # Size of features maps in the discriminator. The depth will be multiples of this.
-    'nepochs' : 100,# Number of training epochs.
+    'nepochs' : 20,# Number of training epochs.
     'lr' : 0.0001,# Learning rate for optimizers
     'beta1' : 0.5,# Beta1 hyperparam for Adam optimizer
     'save_epoch' : 10}# Save step.
@@ -44,7 +44,10 @@ else:
 print("Using device:", device)
 #Use the above code if GPU is not available
 
-training_models_dir = 'TRAINING_models/'
+project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+training_models_dir = os.path.join(project_dir, 'training_models')
+dcgan_results_dir = os.path.join(project_dir, 'dcgan_results')
+training_results_dir = os.path.join(project_dir, 'training_results')
 os.makedirs(training_models_dir, exist_ok=True)
 
 # Get the data.
@@ -52,7 +55,7 @@ dataloader = get_EMNIST(params)
 num_epochs = params['nepochs']
 
 #The help function to plot the loss trend
-def plot_loss(d_losses, g_losses, num_epoch, save=False, save_dir='DCGAN_results/', show=False):
+def plot_loss(d_losses, g_losses, num_epoch, save=False, save_dir=dcgan_results_dir, show=False):
     fig, ax = plt.subplots()
     ax.set_xlim(0, num_epochs)
     ax.set_ylim(0, max(np.max(g_losses), np.max(d_losses))*1.1)
@@ -64,9 +67,8 @@ def plot_loss(d_losses, g_losses, num_epoch, save=False, save_dir='DCGAN_results
 
     # save figure
     if save:
-        if not os.path.exists(save_dir):
-            os.mkdir(save_dir)
-        save_fn = save_dir + 'DCGAN_losses_epoch_{:d}'.format(num_epoch + 1) + '.png'
+        os.makedirs(save_dir, exist_ok=True)
+        save_fn = os.path.join(save_dir, 'DCGAN_losses_epoch_{:d}.png'.format(num_epoch + 1))
         plt.savefig(save_fn)
 
     if show:
@@ -75,7 +77,7 @@ def plot_loss(d_losses, g_losses, num_epoch, save=False, save_dir='DCGAN_results
         plt.close()
 
 #The help function for plotting results
-def plot_result(generator, noise, num_epoch, save=False, save_dir='DCGAN_results/', show=True, fig_size=(5, 5)):
+def plot_result(generator, noise, num_epoch, save=False, save_dir=dcgan_results_dir, show=True, fig_size=(5, 5)):
     generator.train()
 
     with torch.no_grad():
@@ -98,9 +100,8 @@ def plot_result(generator, noise, num_epoch, save=False, save_dir='DCGAN_results
 
     # save figure
     if save:
-        if not os.path.exists(save_dir):
-            os.mkdir(save_dir)
-        save_fn = save_dir + 'DCGAN_epoch_{:d}'.format(num_epoch+1) + '.png'
+        os.makedirs(save_dir, exist_ok=True)
+        save_fn = os.path.join(save_dir, 'DCGAN_epoch_{:d}.png'.format(num_epoch + 1))
         plt.savefig(save_fn)
 
     if show:
@@ -219,13 +220,13 @@ for epoch in range(num_epochs):
     
     # Show result for fixed noise
     if epoch % 10 == 0:
-        plot_result(netG, fixed_noise, epoch, save=True, save_dir= 'TRAINING_results/', fig_size=(5, 5), show = False)
+        plot_result(netG, fixed_noise, epoch, save=True, save_dir=training_results_dir, fig_size=(5, 5), show=False)
 
 torch.save(netG.state_dict(), os.path.join(training_models_dir, 'generator_trained.pth'))
 
 # Plot the training losses.
 plot_loss(D_losses, G_losses, num_epochs-1, save=True, show=False)
-plot_result(netG, fixed_noise, epoch, save=True, save_dir= 'TRAINING_results/', fig_size=(5, 5), show = False)
+plot_result(netG, fixed_noise, epoch, save=True, save_dir=training_results_dir, fig_size=(5, 5), show=False)
 
 
 # Animation showing the improvements of the generator.
@@ -254,6 +255,6 @@ ani = animation.ArtistAnimation(
     blit=True
 )
 
-ani.save("generator_progress.gif", writer="pillow")
+ani.save(os.path.join(project_dir, "generator_progress.gif"), writer="pillow")
 
 plt.close(fig)
