@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import random
 import os
 import matplotlib.animation as animation
+from torchvision.utils import make_grid
 
 
 from utils import get_EMNIST
@@ -26,7 +27,7 @@ params = {
     'nz' : 100,# Size of the Z latent vector (the input to the generator).
     'ngf' : 64,# Size of feature maps in the generator. The depth will be multiples of this.
     'ndf' : 64, # Size of features maps in the discriminator. The depth will be multiples of this.
-    'nepochs' : 20,# Number of training epochs.
+    'nepochs' : 100,# Number of training epochs.
     'lr' : 0.0001,# Learning rate for optimizers
     'beta1' : 0.5,# Beta1 hyperparam for Adam optimizer
     'save_epoch' : 10}# Save step.
@@ -227,8 +228,15 @@ fig = plt.figure(figsize=(8, 8))
 plt.axis("off")
 
 ims = [
-    [plt.imshow(np.transpose(i, (1, 2, 0)), animated=True, cmap="Greys_r")]
-    for i in img_list
+    [plt.imshow(
+        make_grid(images, nrow=8, normalize=True, value_range=(-1, 1))
+        .permute(1, 2, 0)
+        .squeeze()
+        .numpy(),
+        animated=True,
+        cmap="Greys_r"
+    )]
+    for images in img_list
 ]
 
 print("Number of frames:", len(img_list))

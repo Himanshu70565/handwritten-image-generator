@@ -1,3 +1,10 @@
 .git
-emnist_jpeg/
+dataset/
 .DS_Store
+.venv/
+src/DCGAN_results/*
+src/TRAINING_results/*
+src/discriminator_*.pth
+src/generator_*.pth
+src/__pycache__/*
+src/GENERATED_images/*
