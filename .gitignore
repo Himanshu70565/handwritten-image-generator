@@ -4,6 +4,7 @@ dataset/
 .venv/
 src/DCGAN_results/*
 src/TRAINING_results/*
+src/TRAINING_models/*
 src/discriminator_*.pth
 src/generator_*.pth
 src/__pycache__/*

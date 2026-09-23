@@ -42,6 +42,9 @@ else:
 print("Using device:", device)
 #Use the above code if GPU is not available
 
+training_models_dir = 'TRAINING_models/'
+os.makedirs(training_models_dir, exist_ok=True)
+
 # Get the data.
 dataloader = get_EMNIST(params)
 num_epochs = params['nepochs']
@@ -206,8 +209,8 @@ for epoch in range(num_epochs):
     # Save the model.
     if epoch % params['save_epoch'] == 0:
         plot_loss(D_losses, G_losses, epoch, save=True)
-        torch.save(netG.state_dict(), f'generator_{epoch}.pth')
-        torch.save(netD.state_dict(), f'discriminator_{epoch}.pth')
+        torch.save(netG.state_dict(), os.path.join(training_models_dir, f'generator_{epoch}.pth'))
+        torch.save(netD.state_dict(), os.path.join(training_models_dir, f'discriminator_{epoch}.pth'))
         with torch.no_grad():
             fake = netG(fixed_noise).detach().cpu()
             img_list.append(fake)
@@ -216,7 +219,7 @@ for epoch in range(num_epochs):
     if epoch % 10 == 0:
         plot_result(netG, fixed_noise, epoch, save=True, save_dir= 'TRAINING_results/', fig_size=(5, 5), show = False)
 
-torch.save(netG.state_dict(), f'generator_trained.pth')
+torch.save(netG.state_dict(), os.path.join(training_models_dir, 'generator_trained.pth'))
 
 # Plot the training losses.
 plot_loss(D_losses, G_losses, num_epochs-1, save=True, show=False)

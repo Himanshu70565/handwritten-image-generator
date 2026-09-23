@@ -16,7 +16,7 @@ else:
 print("Using device:", device)
 
 model = Generator().to(device)
-model.load_state_dict(torch.load("generator_trained.pth", map_location=device))
+model.load_state_dict(torch.load("TRAINING_models/generator_trained.pth", map_location=device))
 model.eval()
 
 os.makedirs("GENERATED_images", exist_ok=True)
