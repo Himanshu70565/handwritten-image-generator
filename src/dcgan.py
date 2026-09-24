@@ -75,7 +75,7 @@ class Discriminator(nn.Module):
         # CN3: 128 input channel, 256 output channels, 4x4 square convolution, stride=2, padding=1
         self.conv3 = nn.Conv2d(ndf * 2, ndf * 4, kernel_size = 4, stride = 2, padding = 1)
         # CN4: 256 input channel, 1 output channel, 4x4 square convolution, stride=2, padding=0
-        self.conv4 = nn.Conv2d(ndf * 4, nc, kernel_size = 4, stride = 2, padding = 0)
+        self.conv4 = nn.Conv2d(ndf * 4, 1, kernel_size = 4, stride = 2, padding = 0)
 
         # Batch Normalization layers
         self.bn1 = nn.BatchNorm2d(ndf)
@@ -87,20 +87,20 @@ class Discriminator(nn.Module):
         # Convolution layer C1: 1 input channel, 64 output channels,
         # 4x4 square convolution, it uses Batch normalization and RELU activation function, and
         # outputs a Tensor with size (N, 64, 16, 16), where N is the size of the batch
-        c1 = F.relu(self.bn1(self.conv1(input)), negative_slope=0.2)
+        c1 = F.relu(self.bn1(self.conv1(input)))
         # c1 = F.leaky_relu(self.bn1(self.conv1(input)), negative_slope=0.2)
 
         # Convolution layer C2: 64 input channel, 128 output channels,
         # 4x4 square convolution, it uses Batch normalization and RELU activation function, and        
         # outputs a Tensor with size (N, 128, 8, 8), where N is the size of the batch
-        c2 = F.relu(self.bn2(self.conv2(c1)), negative_slope=0.2)
+        c2 = F.relu(self.bn2(self.conv2(c1)))
         # c2 = F.leaky_relu(self.bn2(self.conv2(c1)), negative_slope=0.2)
         
         
         # Convolution layer C3: 128 input channel, 256 output channel
         # 4x4 square convolution, it uses Batch normalization and RELU activation function, and
         # outputs a Tensor with size (N, 256, 4, 4), where N is the size of the batch
-        c3 = F.relu(self.bn3(self.conv3(c2)), negative_slope=0.2)
+        c3 = F.relu(self.bn3(self.conv3(c2)))
         # c3 = F.leaky_relu(self.bn3(self.conv3(c2)), negative_slope=0.2)
 
         # Convolution layer C4: 256 input channel, 1 output channel
