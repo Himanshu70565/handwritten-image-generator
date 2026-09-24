@@ -28,7 +28,7 @@ params = {
     'nz' : 100,# Size of the Z latent vector (the input to the generator).
     'ngf' : 64,# Size of feature maps in the generator. The depth will be multiples of this.
     'ndf' : 64, # Size of features maps in the discriminator. The depth will be multiples of this.
-    'nepochs' : 20,# Number of training epochs.
+    'nepochs' : 100,# Number of training epochs.
     'lr' : 0.0001,# Learning rate for optimizers
     'beta1' : 0.5,# Beta1 hyperparam for Adam optimizer
     'save_epoch' : 10}# Save step.
@@ -57,12 +57,13 @@ num_epochs = params['nepochs']
 #The help function to plot the loss trend
 def plot_loss(d_losses, g_losses, num_epoch, save=False, save_dir=dcgan_results_dir, show=False):
     fig, ax = plt.subplots()
-    ax.set_xlim(0, num_epochs)
+    epochs = range(1, len(d_losses) + 1)
+    ax.set_xlim(1, max(num_epochs, len(d_losses)))
     ax.set_ylim(0, max(np.max(g_losses), np.max(d_losses))*1.1)
-    plt.xlabel('Epoch {0}'.format(num_epoch + 1))
+    plt.xlabel('Epoch')
     plt.ylabel('Loss values')
-    plt.plot(d_losses, label='Discriminator')
-    plt.plot(g_losses, label='Generator')
+    plt.plot(epochs, d_losses, label='Discriminator')
+    plt.plot(epochs, g_losses, label='Generator')
     plt.legend()
 
     # save figure
@@ -147,6 +148,9 @@ print("Now Training...")
 print("-"*25)
 
 for epoch in range(num_epochs):
+    epoch_d_loss = 0.0
+    epoch_g_loss = 0.0
+
     for i, data in enumerate(dataloader, 0):
 
         # Step 1: Training Discriminator with real and fake images.
@@ -205,9 +209,12 @@ for epoch in range(num_epochs):
                   % (epoch, params['nepochs'], i, len(dataloader),
                      errD.item(), errG.item(), D_x, D_G_z1, D_G_z2))
 
-        # Save the losses for plotting.
-        G_losses.append(errG.item())
-        D_losses.append(errD.item())
+        # Accumulate batch losses so the plotted values represent epoch averages.
+        epoch_d_loss += errD.item()
+        epoch_g_loss += errG.item()
+
+    D_losses.append(epoch_d_loss / len(dataloader))
+    G_losses.append(epoch_g_loss / len(dataloader))
 
     # Save the model.
     if epoch % params['save_epoch'] == 0:
